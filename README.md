@@ -34,7 +34,7 @@
 
 ## Installation
 
-HollowDB client is an NPM package. You can install it as:
+HollowDB prover is an NPM package. You can install it as:
 
 ```sh
 yarn add hollowdb-prover    # yarn
@@ -45,6 +45,8 @@ pnpm add hollowdb-prover    # pnpm
 ## Usage
 
 A `Prover` class is exported, where the user must provide path to circuit WASM and prover keys. You can find these files [here](./circuits/) in this repo, but you must place them to wherever you need during your application, e.g. under `public` directory on frontend, or some other directory on backend.
+
+It also provides a `computeKey` function, which is simply a wrapper around the underlying Poseidon hash.
 
 _More documentation soon._
 
