@@ -1,6 +1,11 @@
 import {createHash} from 'crypto';
 import {poseidon1} from 'poseidon-lite/poseidon1';
-const snarkjs = require('snarkjs');
+
+// we need to import like this due to a bug
+// https://vivianblog.hashnode.dev/how-to-create-a-zero-knowledge-dapp-from-zero-to-production
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import {groth16, plonk} from 'snarkjs';
 
 const bn254Prime = BigInt('21888242871839275222246405745257275088548364400416034343698204186575808495617');
 const TooLargeError = new Error('Preimage is larger than the order of scalar field of BN254.');
@@ -30,7 +35,7 @@ export class Prover {
       throw TooLargeError;
     }
 
-    return await snarkjs[this.protocol].fullProve(
+    return await (this.protocol === 'groth16' ? groth16 : plonk).fullProve(
       {
         preimage: preimage,
         curValueHash: curValue ? hashToGroup(JSON.stringify(curValue)) : BigInt(0),
@@ -49,8 +54,11 @@ export function hashToGroup(input: string): bigint {
   return BigInt(hexDigest) % bn254Prime;
 }
 
-/** Compute the key that is the Poseidon hash of some preimage. */
-export function computeKey(preimage: bigint): `0x${string}` {
+/** Compute the key that is the Poseidon hash of some preimage.
+ *
+ * The returned key is a string in hexadecimal format with 0x prefix.
+ */
+export function computeKey(preimage: bigint): string {
   if (preimage >= bn254Prime) {
     throw TooLargeError;
   }
