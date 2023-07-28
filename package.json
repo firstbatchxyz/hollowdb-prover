@@ -1,7 +1,7 @@
 {
   "name": "hollowdb-prover",
   "description": "Zero-knowledge proof generator utiity for HollowDB",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "FirstBatch Team <dev@firstbatch.xyz>",
   "contributors": [
     "Erhan Tezcan <erhan@firstbatch.xyz>"
