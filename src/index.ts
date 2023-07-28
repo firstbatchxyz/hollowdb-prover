@@ -25,11 +25,30 @@ export class Prover {
     readonly protocol: 'groth16' | 'plonk' = 'groth16'
   ) {}
 
-  /** Generate a zero-knowledge proof. */
+  /** Generate a zero-knowledge proof.
+   *
+   * Inputs are hashed-to-group. If input is falsy, it's hash-to-group is treated as 0.
+   */
   async prove(
     preimage: bigint,
     curValue: unknown,
     nextValue: unknown
+  ): Promise<{proof: object; publicSignals: [curValueHash: string, nextValueHash: string, key: string]}> {
+    return await this.proveHashed(
+      preimage,
+      curValue ? hashToGroup(JSON.stringify(curValue)) : BigInt(0),
+      nextValue ? hashToGroup(JSON.stringify(nextValue)) : BigInt(0)
+    );
+  }
+
+  /** Generate a zero-knowledge proof.
+   *
+   * Value inputs are expected to be hashed-to-group and circuit-friendly.
+   */
+  async proveHashed(
+    preimage: bigint,
+    curValueHash: bigint,
+    nextValueHash: bigint
   ): Promise<{proof: object; publicSignals: [curValueHash: string, nextValueHash: string, key: string]}> {
     if (preimage >= bn254Prime) {
       throw TooLargeError;
@@ -37,9 +56,9 @@ export class Prover {
 
     return await (this.protocol === 'groth16' ? groth16 : plonk).fullProve(
       {
-        preimage: preimage,
-        curValueHash: curValue ? hashToGroup(JSON.stringify(curValue)) : BigInt(0),
-        nextValueHash: nextValue ? hashToGroup(JSON.stringify(nextValue)) : BigInt(0),
+        preimage,
+        curValueHash,
+        nextValueHash,
       },
       this.wasmPath,
       this.proverKeyPath
@@ -63,5 +82,5 @@ export function computeKey(preimage: bigint): string {
     throw TooLargeError;
   }
 
-  return `0x${poseidon1([preimage]).toString(16)}`;
+  return '0x' + poseidon1([preimage]).toString(16);
 }
