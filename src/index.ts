@@ -27,23 +27,23 @@ export class Prover {
 
   /** Generate a zero-knowledge proof.
    *
-   * Inputs are hashed-to-group. If input is falsy, it's hash-to-group is treated as 0.
+   * Calls {@link hashToGroup} on inputs, and then generates
+   * a proof with {@link proveHashed}.
    */
   async prove(
     preimage: bigint,
     curValue: unknown,
     nextValue: unknown
   ): Promise<{proof: object; publicSignals: [curValueHash: string, nextValueHash: string, key: string]}> {
-    return await this.proveHashed(
-      preimage,
-      curValue ? hashToGroup(JSON.stringify(curValue)) : BigInt(0),
-      nextValue ? hashToGroup(JSON.stringify(nextValue)) : BigInt(0)
-    );
+    return await this.proveHashed(preimage, hashToGroup(curValue), hashToGroup(nextValue));
   }
 
   /** Generate a zero-knowledge proof.
    *
-   * Value inputs are expected to be hashed-to-group and circuit-friendly.
+   * Value inputs are expected to be results of {@link hashToGroup}. The
+   * incentive of using this function instead of {@link prove} is that the
+   * hash may be stored somewhere, and there is no need to hash the entire value
+   * again at a later time instead of using the existing hash.
    */
   async proveHashed(
     preimage: bigint,
@@ -66,11 +66,25 @@ export class Prover {
   }
 }
 
-/** Given an input, SHA256 it and make sure the result is circuit-friendly. */
-export function hashToGroup(input: string): bigint {
-  const hexDigest = '0x' + createHash('sha256').update(Buffer.from(input)).digest('hex');
-
-  return BigInt(hexDigest) % bn254Prime;
+/** Given an input, stringifies and then hashes it and make sure the result is circuit-friendly for
+ * [BN254](https://docs.circom.io/background/background/#signals-of-a-circuit).
+ *
+ * Uses Ripemd160 for the hash where 160-bit output is guaranteed to be
+ * circuit-friendly (i.e. within the order of the curve's scalar field).
+ *
+ * If a given value is falsy, it will NOT be hashed but instead mapped to 0.
+ */
+export function hashToGroup(value: unknown): bigint {
+  if (value) {
+    return BigInt(
+      '0x' +
+        createHash('ripemd160')
+          .update(Buffer.from(JSON.stringify(value)))
+          .digest('hex')
+    );
+  } else {
+    return BigInt(0);
+  }
 }
 
 /** Compute the key that is the Poseidon hash of some preimage.
