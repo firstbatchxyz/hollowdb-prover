@@ -23,7 +23,6 @@
     "yalc:publish": "yarn build && yalc publish --push"
   },
   "files": [
-    "circuits/",
     "lib/",
     "LICENSE",
     "README.md"

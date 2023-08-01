@@ -18,8 +18,8 @@
     <a href="https://www.npmjs.com/package/hollowdb-prover" target="_blank">
         <img alt="NPM" src="https://img.shields.io/npm/v/hollowdb-prover?logo=npm&color=CB3837">
     </a>
-    <a href="https://docs.hollowdb.xyz" target="_blank">
-        <img alt="License: MIT" src="https://img.shields.io/badge/docs-hollowdb-3884FF.svg?logo=gitbook">
+    <a href="https://docs.hollowdb.xyz/zero-knowledge-proofs/hollowdb-prover" target="_blank">
+        <img alt="Docs" src="https://img.shields.io/badge/docs-hollowdb-3884FF.svg?logo=gitbook">
     </a>
     <a href="./.github/workflows/test.yml" target="_blank">
         <img alt="Workflow: Tests" src="https://github.com/firstbatchxyz/hollowdb-prover/actions/workflows/test.yml/badge.svg?branch=master">
@@ -44,11 +44,7 @@ pnpm add hollowdb-prover    # pnpm
 
 ## Usage
 
-A `Prover` class is exported, where the user must provide path to circuit WASM and prover keys. You can find these files [here](./circuits/) in this repo, but you must place them to wherever you need during your application, e.g. under `public` directory on frontend, or some other directory on backend.
-
-It also provides a `computeKey` function, which is simply a wrapper around the underlying Poseidon hash.
-
-_More documentation soon._
+See documentation at https://docs.hollowdb.xyz/zero-knowledge-proofs/hollowdb-prover.
 
 ## Testing
 
